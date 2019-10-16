@@ -22,6 +22,11 @@ public class CompanyController {
         return companyRepository.findAll();
     }
 
+    @GetMapping(value = "/{name}", produces = {"application/json"})
+    public Company getCompany(@PathVariable String name) {
+        return companyRepository.findOneByName(name);
+    }
+
     @PostMapping(produces = {"application/json"})
     @ResponseStatus(code = HttpStatus.CREATED)
     public Company add(@RequestBody Company company) {
@@ -41,14 +46,12 @@ public class CompanyController {
     }
 
     @DeleteMapping(value = "/{id}", produces = {"application/json"})
-    public ResponseEntity delete(@PathVariable Long id) {
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
+    public void delete(@PathVariable Long id) {
         Optional<Company> fetchedCompany = companyRepository.findById(id);
         if (fetchedCompany.isPresent()) {
             Company deletedCompany = fetchedCompany.get();
             companyRepository.delete(deletedCompany);
-            return new ResponseEntity(HttpStatus.ACCEPTED);
         }
-        return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
-
 }
