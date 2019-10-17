@@ -65,7 +65,26 @@ public class CompanyControllerTest {
     }
 
     @Test
-    void should_get_specific_company_when_get_companies() {
+    void should_get_specific_company_when_get_companies() throws Exception {
+
+        Company company = new Company();
+        company.setId(1L);
+        company.setName("Dan");
+
+        List<Employee> employees= new ArrayList<>();
+        company.setEmployees(employees);
+
+        CompanyProfile profile= new CompanyProfile();
+        company.setProfile(profile);
+        
+        when(companyService.findByNameContaining(any())).thenReturn(company);
+
+        ResultActions result = mockMvc.perform(get("/companies/"));
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Dan")))
+                .andExpect(jsonPath("$.employees").exists())
+                .andExpect(jsonPath("$.profile").exists());
     }
 
     @Test
