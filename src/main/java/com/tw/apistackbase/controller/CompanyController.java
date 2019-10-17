@@ -2,7 +2,6 @@ package com.tw.apistackbase.controller;
 
 import com.tw.apistackbase.core.Company;
 import com.tw.apistackbase.repository.CompanyRepository;
-import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +16,14 @@ public class CompanyController {
     @Autowired
     private CompanyRepository companyRepository;
 
-    @GetMapping(produces = {"application/json"})
+    @GetMapping(value = "/all", produces = {"application/json"})
     public Iterable<Company> list() {
         return companyRepository.findAll();
     }
 
-    @GetMapping(value = "/{name}", produces = {"application/json"})
-    public Company getCompany(@PathVariable String name) {
-        return companyRepository.findOneByName(name);
+    @GetMapping(produces = {"application/json"})
+    public Company getCompany(@RequestParam(required = false) String name) {
+        return companyRepository.findByNameContaining(name);
     }
 
     @PostMapping(produces = {"application/json"})
