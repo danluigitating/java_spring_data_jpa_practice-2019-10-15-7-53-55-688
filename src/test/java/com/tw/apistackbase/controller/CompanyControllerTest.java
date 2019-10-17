@@ -12,10 +12,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
@@ -76,7 +78,7 @@ public class CompanyControllerTest {
 
         CompanyProfile profile= new CompanyProfile();
         company.setProfile(profile);
-        
+
         when(companyService.findByNameContaining(any())).thenReturn(company);
 
         ResultActions result = mockMvc.perform(get("/companies/"));
@@ -114,11 +116,33 @@ public class CompanyControllerTest {
     }
 
     @Test
-    void update() {
+    void should_return_status_ok_if_patch_request_with_given_id() throws Exception {
+        Company company = new Company();
+        company.setId(1L);
+        company.setName("Dan");
+
+        List<Employee> employees= new ArrayList<>();
+        company.setEmployees(employees);
+
+        CompanyProfile profile= new CompanyProfile();
+        company.setProfile(profile);
+
+        Optional<Company> fetchedCompany= Optional.of(company);
+
+        when(companyService.findById(any())).thenReturn(fetchedCompany);
+
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.patch("/companies/{id}", 1)
+                .content(asJsonString(company))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+
+        resultActions.andExpect(status().isOk());
     }
 
     @Test
-    void delete() {
+    void should_delete_when_company_id_is_given() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/companies/{id}", 1) )
+                .andExpect(status().isAccepted());
     }
 
     public static String asJsonString(final Company obj) {
