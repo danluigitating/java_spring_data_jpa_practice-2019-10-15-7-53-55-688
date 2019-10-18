@@ -2,6 +2,7 @@ package com.tw.apistackbase.controller;
 
 import com.tw.apistackbase.core.Company;
 import com.tw.apistackbase.service.CompanyService;
+import javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/companies")
 public class CompanyController {
+    public static final String NOT_FOUND = "Not Found";
     private CompanyService companyService;
 
     public CompanyController(CompanyService companyService) {
@@ -47,11 +49,13 @@ public class CompanyController {
 
     @DeleteMapping(value = "/{id}", produces = {"application/json"})
     @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<String> delete(@PathVariable Long id) throws NotFoundException{
         Optional<Company> fetchedCompany = companyService.findById(id);
         if (fetchedCompany.isPresent()) {
             Company deletedCompany = fetchedCompany.get();
             companyService.delete(deletedCompany);
-        }
+            return new ResponseEntity<>("Company Deleted",HttpStatus.OK);
+        }else
+            throw new NotFoundException(NOT_FOUND);
     }
 }
